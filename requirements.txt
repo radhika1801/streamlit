@@ -1,5 +1,9 @@
-# Activate venv first
-source venv/bin/activate
-
-# Generate requirements
-pip freeze > requirements.txt
+streamlit==1.29.0
+transformers==4.36.0
+torch==2.1.2
+torchvision==0.16.2
+pillow
+plotly
+pandas
+accelerate
+safetensors
