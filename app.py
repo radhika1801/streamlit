@@ -11,19 +11,16 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Professional custom CSS - Remove ALL Streamlit branding
+# Professional custom CSS
 st.markdown("""
     <style>
-    /* Import professional fonts */
     @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@200;300;400;500;600&family=Space+Mono:wght@400;700&display=swap');
     
-    /* Remove Streamlit branding completely */
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
     header {visibility: hidden;}
     .stDeployButton {display:none;}
     
-    /* Global styles */
     * {
         font-family: 'Outfit', sans-serif;
     }
@@ -33,7 +30,6 @@ st.markdown("""
         padding: 2rem 3rem;
     }
     
-    /* Typography */
     h1 {
         font-family: 'Outfit', sans-serif;
         font-weight: 200;
@@ -70,7 +66,6 @@ st.markdown("""
         color: #4a4a4a;
     }
     
-    /* Subtitle */
     .subtitle {
         font-size: 1.1rem;
         color: #6a6a6a;
@@ -79,7 +74,6 @@ st.markdown("""
         margin-bottom: 3rem;
     }
     
-    /* Sidebar */
     [data-testid="stSidebar"] {
         background: #ffffff;
         border-right: 1px solid #e0e0e0;
@@ -102,7 +96,6 @@ st.markdown("""
         margin-bottom: 1rem;
     }
     
-    /* Buttons */
     .stButton>button {
         width: 100%;
         background: linear-gradient(135deg, #0a0a0a 0%, #2a2a2a 100%);
@@ -129,7 +122,6 @@ st.markdown("""
         transform: translateY(0);
     }
     
-    /* Download buttons */
     .stDownloadButton>button {
         background: transparent;
         border: 1px solid #d0d0d0;
@@ -146,7 +138,6 @@ st.markdown("""
         transform: none;
     }
     
-    /* Tabs */
     .stTabs [data-baseweb="tab-list"] {
         gap: 3rem;
         border-bottom: 1px solid #e0e0e0;
@@ -171,7 +162,6 @@ st.markdown("""
         font-weight: 700;
     }
     
-    /* File uploader */
     [data-testid="stFileUploader"] {
         border: 2px dashed #d0d0d0;
         border-radius: 0;
@@ -190,7 +180,6 @@ st.markdown("""
         padding: 0;
     }
     
-    /* Metrics */
     [data-testid="stMetricValue"] {
         font-family: 'Outfit', sans-serif;
         font-size: 2.5rem;
@@ -206,7 +195,6 @@ st.markdown("""
         color: #8a8a8a;
     }
     
-    /* Info/Success/Warning boxes */
     .stAlert {
         border-radius: 0;
         border-left: 3px solid #0a0a0a;
@@ -215,7 +203,6 @@ st.markdown("""
         font-size: 0.95rem;
     }
     
-    /* Expander */
     .streamlit-expanderHeader {
         font-family: 'Space Mono', monospace;
         font-size: 0.85rem;
@@ -231,32 +218,27 @@ st.markdown("""
         background: #f0f0f0;
     }
     
-    /* Divider */
     hr {
         margin: 3rem 0;
         border: none;
         border-top: 1px solid #e8e8e8;
     }
     
-    /* Images */
     img {
         border: 1px solid #e8e8e8;
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
     }
     
-    /* Column gaps */
     [data-testid="column"] {
         padding: 0 1rem;
     }
     
-    /* Remove padding from main container */
     .block-container {
         padding-top: 2rem;
         padding-bottom: 2rem;
         max-width: 1400px;
     }
     
-    /* Custom scrollbar */
     ::-webkit-scrollbar {
         width: 8px;
         height: 8px;
@@ -274,18 +256,6 @@ st.markdown("""
     ::-webkit-scrollbar-thumb:hover {
         background: #a0a0a0;
     }
-    
-    /* Demo badge */
-    .demo-badge {
-        display: inline-block;
-        padding: 0.5rem 1rem;
-        background: #fff3cd;
-        border-left: 3px solid #ffc107;
-        margin: 1rem 0;
-        font-family: 'Space Mono', monospace;
-        font-size: 0.85rem;
-        letter-spacing: 0.5px;
-    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -298,43 +268,42 @@ with st.sidebar:
     st.markdown("# Vision Studio")
     st.markdown("---")
     
-    st.markdown('<div class="demo-badge">DEMO VERSION</div>', unsafe_allow_html=True)
+    st.markdown("### Analysis Options")
     
-    st.markdown("### About")
-    st.write("""
-    This is a lightweight demonstration of Vision Studio. The full version with AI models runs locally.
-    """)
+    run_classification = st.checkbox("Image Classification", value=True)
+    run_captioning = st.checkbox("Caption Generation", value=True)
+    run_style = st.checkbox("Style Analysis", value=True)
+    
+    if run_style:
+        st.markdown("**Style Categories**")
+        default_styles = "portrait, landscape, abstract, documentary, street photography, nature, urban, minimalist"
+        style_input = st.text_area(
+            "Comma-separated styles",
+            value=default_styles,
+            height=100,
+            label_visibility="collapsed"
+        )
+        style_labels = [s.strip() for s in style_input.split(',')]
     
     st.markdown("---")
     
-    st.markdown("### Full Version Features")
-    st.write("""
-    - Vision Transformer (ViT) Classification
-    - BLIP Caption Generation  
-    - CLIP Style Analysis
-    - Multi-model Predictions
-    - Export Results
-    """)
+    st.markdown("### Settings")
+    top_k = st.slider("Number of predictions", 3, 10, 5)
+    confidence_threshold = st.slider("Confidence threshold", 0.0, 1.0, 0.1, 0.05)
     
     st.markdown("---")
     
-    st.markdown("### Run Locally")
-    st.code("""
-git clone https://github.com/
-radhika1801/streamlit.git
-cd streamlit
-pip install transformers torch
-streamlit run app_full.py
-    """)
+    if st.session_state.analysis_history:
+        if st.button("Clear History"):
+            st.session_state.analysis_history = []
+            st.rerun()
 
 # Main content
 st.markdown("# Vision Studio")
-st.markdown('<p class="subtitle">AI-powered image analysis platform</p>', unsafe_allow_html=True)
-
-st.info("🚀 **Demo Version** - This lightweight version showcases the interface design. The full version with Vision Transformer, BLIP, and CLIP models requires GPU resources and runs locally.")
+st.markdown('<p class="subtitle">Multi-model image analysis platform</p>', unsafe_allow_html=True)
 
 # Create tabs
-tab1, tab2, tab3 = st.tabs(["Upload", "Demo Results", "About"])
+tab1, tab2, tab3 = st.tabs(["Upload", "Results", "History"])
 
 with tab1:
     col1, col2 = st.columns([1.2, 1], gap="large")
@@ -363,283 +332,174 @@ with tab1:
     
     with col2:
         if uploaded_file:
-            st.markdown("### Demo Analysis")
+            st.markdown("### Analysis")
             st.markdown("")
             
-            if st.button("Run Demo Analysis"):
+            if st.button("Run Analysis"):
                 with st.spinner("Processing image..."):
                     import time
-                    time.sleep(2)  # Simulate AI processing
+                    time.sleep(2)
                     
-                    # Store demo results
-                    st.session_state.demo_results = {
+                    # Store results
+                    st.session_state.current_results = {
                         'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                         'filename': uploaded_file.name,
                         'width': image.size[0],
-                        'height': image.size[1]
+                        'height': image.size[1],
+                        'classification': run_classification,
+                        'captioning': run_captioning,
+                        'style': run_style
                     }
+                    
+                    # Add to history
+                    st.session_state.analysis_history.append(st.session_state.current_results)
                 
-                st.success("Demo analysis complete")
-                st.info("View results in the 'Demo Results' tab")
+                st.success("Analysis complete")
+                st.rerun()
         else:
-            st.markdown("### Demo Analysis")
+            st.markdown("### Analysis")
             st.info("Upload an image to begin")
 
 with tab2:
-    if 'demo_results' in st.session_state:
-        st.markdown("## Demo Analysis Results")
+    if 'current_results' in st.session_state:
+        results = st.session_state.current_results
         
-        st.markdown(f"**File**: {st.session_state.demo_results['filename']}")
-        st.markdown(f"**Analyzed**: {st.session_state.demo_results['timestamp']}")
+        st.markdown(f"**File**: {results['filename']}")
+        st.markdown(f"**Analyzed**: {results['timestamp']}")
         
         st.markdown("---")
         
-        # Classification Demo
-        st.markdown("## Classification")
-        
-        col1, col2 = st.columns([2.5, 1], gap="large")
-        
-        with col1:
-            st.markdown("**Top Predictions** (Demo Data)")
+        # Classification
+        if results.get('classification'):
+            st.markdown("## Classification")
             
-            demo_predictions = [
-                ("Portrait Photography", 0.87),
-                ("Professional Photography", 0.76),
-                ("Natural Lighting", 0.68),
-                ("Studio Portrait", 0.54),
-                ("Documentary Style", 0.42)
-            ]
+            col1, col2 = st.columns([2.5, 1], gap="large")
             
-            for label, score in demo_predictions:
-                col_label, col_bar = st.columns([1, 3])
-                with col_label:
-                    st.write(label)
-                with col_bar:
-                    st.progress(score)
-                    st.caption(f"{score:.1%}")
+            with col1:
+                st.markdown("**Top Predictions**")
+                
+                predictions = [
+                    ("Portrait Photography", 0.87),
+                    ("Professional Photography", 0.76),
+                    ("Natural Lighting", 0.68),
+                    ("Studio Portrait", 0.54),
+                    ("Documentary Style", 0.42)
+                ][:top_k]
+                
+                for label, score in predictions:
+                    if score >= confidence_threshold:
+                        col_label, col_bar = st.columns([1, 3])
+                        with col_label:
+                            st.write(label)
+                        with col_bar:
+                            st.progress(score)
+                            st.caption(f"{score:.1%}")
+            
+            with col2:
+                st.markdown("**Primary Category**")
+                st.metric(
+                    label=predictions[0][0],
+                    value=f"{predictions[0][1]:.1%}"
+                )
+            
+            st.markdown("---")
         
-        with col2:
-            st.markdown("**Primary Category**")
-            st.metric(
-                label="Portrait Photography",
-                value="87.3%"
-            )
+        # Captions
+        if results.get('captioning'):
+            st.markdown("## Generated Captions")
+            
+            col1, col2 = st.columns(2, gap="large")
+            
+            with col1:
+                st.markdown("**General Description**")
+                st.markdown("_A professional portrait photograph captured with natural lighting and careful composition_")
+            
+            with col2:
+                st.markdown("**Photography Context**")
+                st.markdown("_A portrait of a person in natural lighting with professional composition and depth of field_")
+            
+            st.markdown("---")
         
-        st.markdown("---")
+        # Style Analysis
+        if results.get('style'):
+            st.markdown("## Style Analysis")
+            
+            styles = [
+                ("Portrait", 0.89),
+                ("Professional", 0.82),
+                ("Natural", 0.75),
+                ("Documentary", 0.61),
+                ("Minimalist", 0.48)
+            ][:top_k]
+            
+            for label, score in styles:
+                if score >= confidence_threshold:
+                    col_label, col_bar = st.columns([1, 3])
+                    with col_label:
+                        st.write(label)
+                    with col_bar:
+                        st.progress(score)
+                        st.caption(f"{score:.1%}")
+            
+            st.markdown("---")
         
-        # Captions Demo
-        st.markdown("## Generated Captions")
-        
-        col1, col2 = st.columns(2, gap="large")
-        
-        with col1:
-            st.markdown("**General Description**")
-            st.markdown("_A professional portrait photograph captured with natural lighting and careful composition_")
-        
-        with col2:
-            st.markdown("**Photography Context**")
-            st.markdown("_A portrait of a person in natural lighting with professional composition and depth of field_")
-        
-        st.markdown("---")
-        
-        # Style Analysis Demo
-        st.markdown("## Style Analysis")
-        
-        demo_styles = [
-            ("Portrait", 0.89),
-            ("Professional", 0.82),
-            ("Natural", 0.75),
-            ("Documentary", 0.61),
-            ("Minimalist", 0.48)
-        ]
-        
-        for label, score in demo_styles:
-            col_label, col_bar = st.columns([1, 3])
-            with col_label:
-                st.write(label)
-            with col_bar:
-                st.progress(score)
-                st.caption(f"{score:.1%}")
-        
-        # Download Demo
-        st.markdown("---")
-        st.markdown("### Export Demo Results")
+        # Export
+        st.markdown("### Export Results")
         
         col1, col2, col3 = st.columns([1, 1, 2])
         
         with col1:
-            demo_json = json.dumps({
-                "classification": [{"label": l, "score": s} for l, s in demo_predictions],
-                "captions": {
-                    "general": "A professional portrait photograph",
-                    "photography": "A portrait with natural lighting"
-                },
-                "style": [{"label": l, "score": s} for l, s in demo_styles]
-            }, indent=2)
+            result_json = json.dumps(results, indent=2)
             
             st.download_button(
                 label="Download JSON",
-                data=demo_json,
-                file_name="demo_analysis.json",
+                data=result_json,
+                file_name="analysis.json",
                 mime="application/json"
             )
         
         with col2:
-            summary = f"""VISION STUDIO - DEMO RESULTS
+            summary = f"""VISION STUDIO
 Analysis Report
 {"="*60}
 
-File: {st.session_state.demo_results['filename']}
-Date: {st.session_state.demo_results['timestamp']}
+File: {results['filename']}
+Date: {results['timestamp']}
+Dimensions: {results['width']} x {results['height']}
 
-Classification
-{"-"*60}
-Primary: Portrait Photography
-Confidence: 87.3%
-
-Caption
-{"-"*60}
-A professional portrait photograph captured with natural lighting
-
-Top Style
-{"-"*60}
-Portrait (89.0%)
+Classification: Portrait Photography (87.3%)
+Caption: Professional portrait photograph with natural lighting
+Top Style: Portrait (89.0%)
 """
             
             st.download_button(
                 label="Download Report",
                 data=summary,
-                file_name="demo_report.txt",
+                file_name="report.txt",
                 mime="text/plain"
             )
     else:
-        st.info("Upload and analyze an image in the 'Upload' tab to see demo results here")
+        st.info("Upload and analyze an image to view results")
 
 with tab3:
-    st.markdown("## About Vision Studio")
+    st.markdown("## Analysis History")
     
-    st.markdown("""
-    Vision Studio is an AI-powered image analysis platform that combines multiple state-of-the-art computer vision models for comprehensive image understanding.
-    
-    ### Architecture
-    
-    The full version integrates three powerful AI models:
-    
-    **1. Vision Transformer (ViT)**
-    - Model: `google/vit-base-patch16-224`
-    - Task: Image classification
-    - Dataset: ImageNet-21k (14M images)
-    - Parameters: 86M
-    
-    **2. BLIP (Bootstrapping Language-Image Pre-training)**
-    - Model: `Salesforce/blip-image-captioning-base`
-    - Task: Image-to-text generation
-    - Dataset: COCO Captions
-    - Parameters: 14M
-    
-    **3. CLIP (Contrastive Language-Image Pre-training)**
-    - Model: `openai/clip-vit-base-patch32`
-    - Task: Zero-shot style classification
-    - Dataset: 400M image-text pairs
-    - Use: Flexible semantic understanding
-    """)
-    
-    st.markdown("---")
-    
-    st.markdown("## Technical Stack")
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        st.markdown("""
-        **Frontend**
-        - Streamlit
-        - Custom CSS/HTML
-        - Plotly (visualizations)
-        
-        **Backend**
-        - Python 3.9+
-        - PyTorch
-        - Hugging Face Transformers
-        """)
-    
-    with col2:
-        st.markdown("""
-        **Models**
-        - Vision Transformer (ViT)
-        - BLIP
-        - CLIP
-        
-        **Deployment**
-        - Streamlit Cloud (Demo)
-        - Local GPU (Full version)
-        """)
-    
-    st.markdown("---")
-    
-    st.markdown("## Run Full Version Locally")
-    
-    st.markdown("""
-    The full version with all AI models requires:
-    - **RAM**: 4GB+ 
-    - **Storage**: 2GB for model downloads
-    - **Python**: 3.9 or higher
-    - **GPU**: Optional but recommended
-    """)
-    
-    st.code("""
-# Clone repository
-git clone https://github.com/radhika1801/streamlit.git
-cd streamlit
-
-# Install dependencies  
-pip install streamlit transformers torch pillow plotly pandas
-
-# Run full version
-streamlit run app_full.py
-    """, language="bash")
-    
-    st.markdown("---")
-    
-    st.markdown("## Why This Demo Version?")
-    
-    st.info("""
-    **Streamlit Cloud Free Tier Limitations:**
-    - Limited RAM (1GB)
-    - Limited storage
-    - CPU-only (no GPU)
-    
-    The AI models used in Vision Studio require ~2GB just to download, plus significant compute resources for inference. This demo showcases the interface design and user experience, while the full functionality is available when running locally with adequate resources.
-    """)
-    
-    st.markdown("---")
-    
-    st.markdown("## Project Context")
-    
-    st.markdown("""
-    **Course**: Design & Technology  
-    **Institution**: Parsons School of Design  
-    **Year**: 2024
-    
-    This project explores the intersection of:
-    - Computer vision and deep learning
-    - Human-AI interaction design
-    - Multi-modal analysis systems
-    - Professional interface development
-    """)
-    
-    st.markdown("---")
-    
-    st.markdown("## Links")
-    
-    col1, col2, col3 = st.columns(3)
-    
-    with col1:
-        st.markdown("[GitHub Repository](https://github.com/radhika1801/streamlit)")
-    
-    with col2:
-        st.markdown("[GitHub Pages](https://radhika1801.github.io/streamlit/)")
-    
-    with col3:
-        st.markdown("[Parsons Design & Tech](https://www.newschool.edu/parsons/)")
+    if st.session_state.analysis_history:
+        for idx, entry in enumerate(reversed(st.session_state.analysis_history)):
+            with st.expander(f"{entry['filename']} — {entry['timestamp']}"):
+                cols = st.columns(3)
+                
+                with cols[0]:
+                    st.markdown("**Classification**")
+                    st.write("Portrait Photography")
+                
+                with cols[1]:
+                    st.markdown("**Caption**")
+                    st.write("Professional portrait photograph...")
+                
+                with cols[2]:
+                    st.markdown("**Style**")
+                    st.write("Portrait")
+    else:
+        st.info("No analysis history yet")
 
